@@ -8,6 +8,9 @@ on:
   workflow_dispatch:
 
 permissions:
+  contents: read
+  pull-requests: write
+  issues: write
   security-events: write
 
 jobs:
@@ -17,7 +20,7 @@ jobs:
       matrix:
         python-version: ['3.11','3.12']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -51,7 +54,7 @@ jobs:
       matrix:
         linter: [flake8, pylint, ruff, mypy]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: advanced-security/python-lint-code-scanning-action@v1
         with:
           linter: ${{ matrix.linter }}
@@ -66,7 +69,7 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run PyCharm Security
         uses: tonybaloney/pycharm-security@master
@@ -98,7 +101,7 @@ jobs:
           tags: student/hostinfo:latest
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: 'student/hostinfo:latest'
           format: 'table'
@@ -117,7 +120,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: anc95/ChatGPT-CodeReview@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -127,7 +130,7 @@ jobs:
     needs: [build-test, lint, security-scan, docker]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: AI Workflow Summary
         uses: anc95/ChatGPT-CodeReview@main
         env:
